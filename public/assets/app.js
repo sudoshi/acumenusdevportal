@@ -598,7 +598,7 @@ function renderRuntimeLinks() {
     return;
   }
   container.innerHTML = runtimeLinks
-    .map(([label, href]) => `<a href="${escapeAttribute(href)}">${escapeHtml(label)}</a>`)
+    .map(([label, href]) => `<a href="${escapeAttribute(href)}" class="button secondary external" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`)
     .join("");
 }
 
