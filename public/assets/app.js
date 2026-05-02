@@ -173,13 +173,6 @@ function formatShortDateTime(value) {
   });
 }
 
-function statusLabel(health) {
-  if (!health) {
-    return "Unknown";
-  }
-  return health.ok ? "Ready" : "Blocked";
-}
-
 function getAsset(id) {
   return state.assetHealth.find((asset) => asset.id === id);
 }
@@ -1608,15 +1601,6 @@ function renderBuildStamp() {
   } else {
     el.textContent = "Static portal";
   }
-}
-
-function newestTimestamp(items, getter) {
-  let newest = 0;
-  for (const item of items) {
-    const t = new Date(getter(item) || 0).getTime();
-    if (!Number.isNaN(t) && t > newest) newest = t;
-  }
-  return newest;
 }
 
 function evaluateWhatsNew() {
