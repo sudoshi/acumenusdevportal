@@ -1988,3 +1988,123 @@ async function init() {
 }
 
 init();
+
+/* ─── Background cycler — slow Parthenon photography rotation ────────── */
+
+const BG_IMAGES = [
+  "/assets/backgrounds/bg-01.webp",
+  "/assets/backgrounds/bg-02.webp",
+  "/assets/backgrounds/bg-03.webp",
+  "/assets/backgrounds/bg-04.webp",
+  "/assets/backgrounds/bg-05.webp",
+  "/assets/backgrounds/bg-06.webp",
+  "/assets/backgrounds/bg-07.webp",
+  "/assets/backgrounds/bg-08.webp",
+];
+const BG_HOLD_MS = 30000;
+const BG_FADE_MS = 6000;
+
+function preloadImage(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = src;
+  });
+}
+
+function shuffled(arr) {
+  const out = arr.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+async function startBackgroundCycle() {
+  const layerA = document.querySelector('[data-bg-layer="a"]');
+  const layerB = document.querySelector('[data-bg-layer="b"]');
+  if (!layerA || !layerB) return;
+
+  const order = shuffled(BG_IMAGES);
+  let index = 0;
+  let visibleLayer = layerA;
+  let hiddenLayer = layerB;
+
+  // Initial paint — preload first image, set on visible layer.
+  await preloadImage(order[0]);
+  visibleLayer.style.backgroundImage = `url("${order[0]}")`;
+  visibleLayer.classList.add("is-visible");
+
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion) {
+    // Lock to one image — no cycling, no Ken Burns.
+    visibleLayer.style.animation = "none";
+    return;
+  }
+
+  let timeoutId = null;
+  let paused = false;
+
+  const advance = async () => {
+    if (paused) return;
+    index = (index + 1) % order.length;
+    const nextSrc = order[index];
+    await preloadImage(nextSrc);
+    if (paused) return;
+
+    // Stage next image on the hidden layer, then swap visibility.
+    hiddenLayer.style.backgroundImage = `url("${nextSrc}")`;
+    // Restart Ken Burns animation on the incoming layer.
+    hiddenLayer.style.animation = "none";
+    // Force reflow so the animation restarts cleanly.
+    void hiddenLayer.offsetWidth;
+    hiddenLayer.style.animation = "";
+
+    hiddenLayer.classList.add("is-visible");
+    visibleLayer.classList.remove("is-visible");
+
+    [visibleLayer, hiddenLayer] = [hiddenLayer, visibleLayer];
+
+    timeoutId = window.setTimeout(advance, BG_HOLD_MS);
+  };
+
+  timeoutId = window.setTimeout(advance, BG_HOLD_MS);
+
+  // Pause when tab hidden, resume when shown.
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      paused = true;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+    } else {
+      paused = false;
+      if (!timeoutId) {
+        timeoutId = window.setTimeout(advance, BG_FADE_MS);
+      }
+    }
+  });
+
+  // Re-evaluate reduced-motion preference if it changes.
+  if (window.matchMedia) {
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const listener = (event) => {
+      if (event.matches) {
+        paused = true;
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+        visibleLayer.style.animation = "none";
+        hiddenLayer.style.animation = "none";
+      }
+    };
+    if (mql.addEventListener) mql.addEventListener("change", listener);
+    else if (mql.addListener) mql.addListener(listener);
+  }
+}
+
+startBackgroundCycle();

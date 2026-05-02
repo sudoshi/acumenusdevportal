@@ -14,6 +14,12 @@ public/reference/
 # Local SchemaSpy install (downloaded by scripts/generate-schemaspy.sh).
 tools/
 
+# Raw source photography (~28 MB). The 8 backgrounds shipped to the portal
+# live in public/assets/backgrounds/ as optimized 2400px WebPs (~2.4 MB
+# total). The raw originals are kept locally for future re-optimization but
+# don't need to be in the repo.
+images/
+
 # Editor / OS noise
 .DS_Store
 Thumbs.db
