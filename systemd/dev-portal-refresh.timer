@@ -1,0 +1,14 @@
+[Unit]
+Description=Periodic refresh of dev.acumenus.net portal assets
+
+[Timer]
+# Run 2 minutes after boot, then hourly on the :07 mark.
+# Adjust the schedule below if you want a different cadence.
+OnBootSec=2min
+OnCalendar=*-*-* *:07:00
+Persistent=true
+RandomizedDelaySec=2min
+Unit=dev-portal-refresh.service
+
+[Install]
+WantedBy=timers.target

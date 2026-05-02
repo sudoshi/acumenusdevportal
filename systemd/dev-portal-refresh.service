@@ -1,0 +1,24 @@
+[Unit]
+Description=Refresh dev.acumenus.net portal assets (graphify, screenshots, reference, build-info)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=smudoshi
+Group=smudoshi
+WorkingDirectory=/home/smudoshi/Github/dev.acumenus.net
+# Pass the Parthenon checkout path as $1 if it differs from the default.
+ExecStart=/home/smudoshi/Github/dev.acumenus.net/scripts/sync-assets.sh /home/smudoshi/Github/Parthenon
+# Hardening — read-only outside of public/
+ProtectSystem=strict
+ReadWritePaths=/home/smudoshi/Github/dev.acumenus.net/public
+NoNewPrivileges=true
+# Don't fail the timer on transient sync errors; log them and move on.
+SuccessExitStatus=0
+TimeoutStartSec=15min
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Parthenon Developer Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Source+Serif+4:wght@400;600&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+      (function(){
+        var stored=localStorage.getItem('parthenon-theme');
+        var mode=stored||'system';
+        var effective;
+        if(mode==='light'){effective='light';}
+        else if(mode==='dark'){effective='dark';}
+        else{effective=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}
+        if(effective==='light'){document.documentElement.classList.add('light');}
+      })();
+    </script>
+    <link rel="stylesheet" href="/assets/styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <div>
+        <nav class="breadcrumbs" aria-label="Portal context">
+          <a href="/">Developer portal</a>
+          <span>Parthenon</span>
+          <span id="breadcrumb-current" data-breadcrumb-current hidden></span>
+        </nav>
+        <p class="eyebrow">dev.acumenus.net</p>
+        <h1>Parthenon Developer Portal</h1>
+        <p class="lead">
+          Architecture graphs, database analysis, visual regression evidence, reference docs, and live environment links for Parthenon engineering work.
+        </p>
+      </div>
+      <div class="header-actions">
+        <nav class="quick-actions" aria-label="Primary resources">
+          <a href="https://parthenon.acumenus.net/" class="button secondary external" target="_blank" rel="noopener noreferrer">Live Parthenon</a>
+        </nav>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cycle theme: system, dark, light">
+          <span class="theme-indicator" aria-hidden="true"></span>
+          <span id="theme-toggle-label">Dark</span>
+          <span class="theme-mode-label" id="theme-mode-label">system</span>
+        </button>
+        <button id="help-toggle" class="icon-button" type="button" aria-label="Show keyboard shortcuts (?)" title="Keyboard shortcuts">?</button>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <div id="whats-new-banner" class="whats-new-banner" role="status" aria-live="polite" hidden>
+        <div class="whats-new-content" id="whats-new-content"></div>
+        <button type="button" id="whats-new-dismiss" aria-label="Dismiss what's new">Dismiss</button>
+      </div>
+
+      <section class="global-search" aria-label="Search developer portal assets">
+        <div>
+          <p class="eyebrow">unified search</p>
+          <label for="global-search-input">Search graphs, database schemas, screenshots, and reference docs</label>
+        </div>
+        <div class="global-search-box">
+          <input id="global-search-input" type="search" placeholder="measurement, auth, publish, /jobs, README...">
+          <kbd class="search-hint" aria-hidden="true">/</kbd>
+          <button id="global-search-clear" class="icon-button" type="button" aria-label="Clear global search">Clear</button>
+        </div>
+        <div id="global-search-results" class="global-search-results" hidden></div>
+      </section>
+
+      <section class="status-strip" aria-label="Portal status">
+        <a class="status-card" href="#graphs" data-tab-link="graphs">
+          <span class="metric" id="graph-count">--</span>
+          <span class="label">Graph views</span>
+        </a>
+        <a class="status-card" href="#screenshots" data-tab-link="screenshots">
+          <span class="metric" id="screenshot-count">--</span>
+          <span class="label">Screenshots</span>
+        </a>
+        <a class="status-card" href="#screenshots" data-tab-link="screenshots">
+          <span class="metric" id="route-count">--</span>
+          <span class="label">UI routes</span>
+        </a>
+        <a class="status-card" href="#screenshots" data-tab-link="screenshots">
+          <span class="metric" id="locale-count">--</span>
+          <span class="label">Locales</span>
+        </a>
+        <a class="status-card" href="#database" data-tab-link="database">
+          <span class="metric" id="schema-count">--</span>
+          <span class="label">DB schemas</span>
+        </a>
+      </section>
+
+      <section class="tabs" role="tablist" aria-label="Developer portal views">
+        <button class="tab active" id="tab-overview" data-tab="overview" type="button" role="tab" aria-selected="true" aria-controls="overview" tabindex="0">Overview</button>
+        <button class="tab" id="tab-graphs" data-tab="graphs" type="button" role="tab" aria-selected="false" aria-controls="graphs" tabindex="-1">Graphs<span class="tab-health" data-tab-health="graphs" aria-hidden="true"></span></button>
+        <button class="tab" id="tab-database" data-tab="database" type="button" role="tab" aria-selected="false" aria-controls="database" tabindex="-1">Database<span class="tab-health" data-tab-health="database" aria-hidden="true"></span></button>
+        <button class="tab" id="tab-screenshots" data-tab="screenshots" type="button" role="tab" aria-selected="false" aria-controls="screenshots" tabindex="-1">Screenshots<span class="tab-health" data-tab-health="screenshots" aria-hidden="true"></span></button>
+        <button class="tab" id="tab-reference" data-tab="reference" type="button" role="tab" aria-selected="false" aria-controls="reference" tabindex="-1">Reference<span class="tab-health" data-tab-health="reference" aria-hidden="true"></span></button>
+      </section>
+
+      <section id="overview" class="panel active" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">developer map</p>
+            <h2 id="overview-heading">Operational Index</h2>
+          </div>
+          <p id="last-updated" class="muted">Loading asset metadata...</p>
+        </div>
+        <div class="resource-grid">
+          <article class="resource-card accent-green">
+            <div>
+              <p class="card-kicker">Graphs</p>
+              <h3>Graphify Knowledge Views</h3>
+              <p>Curated code graphs across workflows, services, frontend modules, models, and admin surfaces.</p>
+            </div>
+            <div class="card-actions">
+              <a href="#graphs" data-tab-link="graphs">Browse views</a>
+            </div>
+          </article>
+          <article class="resource-card accent-blue">
+            <div>
+              <p class="card-kicker">Screenshots</p>
+              <h3>E2E Screenshot Catalogue</h3>
+              <p>Route-level screenshots across locales and themes for visual review, i18n checks, and release inspection.</p>
+            </div>
+            <div class="card-actions">
+              <a href="#screenshots" data-tab-link="screenshots">Filter screenshots</a>
+            </div>
+          </article>
+          <article class="resource-card accent-gold">
+            <div>
+              <p class="card-kicker">Database</p>
+              <h3>SchemaSpy Database Analysis</h3>
+              <p>Detailed <code>app</code>, <code>omop</code>, and <code>vocab</code> schema reports with table relationships, size rankings, metadata gaps, and direct table documentation.</p>
+            </div>
+            <div class="card-actions">
+              <a href="#database" data-tab-link="database">Browse schemas</a>
+            </div>
+          </article>
+          <article class="resource-card accent-red">
+            <div>
+              <p class="card-kicker">Runtime</p>
+              <h3>Live Developer Links</h3>
+              <p>Fast access to the production app, published docs, API docs, jobs, and install entry points.</p>
+            </div>
+            <div class="card-actions stacked" id="runtime-links"></div>
+          </article>
+        </div>
+
+        <div class="two-column">
+          <section class="plain-section">
+            <h3>Recent Visual Evidence</h3>
+            <div id="overview-screenshots" class="preview-grid"></div>
+          </section>
+          <section class="plain-section">
+            <h3>High-Signal Graphs</h3>
+            <div id="overview-graphs" class="compact-list"></div>
+          </section>
+        </div>
+
+        <section class="plain-section secondary-grid">
+          <h3>Recent Captures</h3>
+          <div id="recent-captures" class="timeline-list"></div>
+        </section>
+      </section>
+
+      <section id="graphs" class="panel" role="tabpanel" aria-labelledby="tab-graphs" tabindex="0" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">graphify</p>
+            <h2 id="graphs-heading">Architecture Graph Library</h2>
+          </div>
+          <div class="section-heading-links">
+            <a href="/graphify/" class="text-link">Static index</a>
+            <a href="/graphify/catalog.json" class="text-link">Raw catalog JSON</a>
+          </div>
+        </div>
+        <div class="toolbar">
+          <label>
+            <span>Search</span>
+            <input id="graph-search" type="search" placeholder="study, publish, auth, frontend...">
+          </label>
+          <label>
+            <span>Category</span>
+            <select id="graph-category"></select>
+          </label>
+          <label>
+            <span>Sort</span>
+            <select id="graph-sort">
+              <option value="title">Title</option>
+              <option value="nodes">Most nodes</option>
+              <option value="edges">Most edges</option>
+              <option value="communities">Most communities</option>
+            </select>
+          </label>
+        </div>
+        <div id="graph-chips" class="filter-chips" data-panel-chips="graphs"></div>
+        <p id="graph-result-count" class="result-count" aria-live="polite"></p>
+        <div id="graph-results" class="data-grid"></div>
+      </section>
+
+      <section id="database" class="panel" role="tabpanel" aria-labelledby="tab-database" tabindex="0" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">schemaspy</p>
+            <h2 id="database-heading">Database Analysis</h2>
+          </div>
+          <div class="section-heading-links">
+            <a href="/schemaspy/" class="text-link">Static index</a>
+            <a href="/schemaspy/manifest.json" class="text-link">Raw manifest JSON</a>
+          </div>
+        </div>
+        <p class="muted">Generated from the local PostgreSQL <code>parthenon</code> database with SchemaSpy and catalog metadata estimates.</p>
+        <div id="database-summary" class="reference-summary" aria-live="polite"></div>
+        <div id="database-results" class="data-grid"></div>
+        <section class="plain-section">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">footprint</p>
+              <h3>Largest Relations</h3>
+            </div>
+            <a href="/schemaspy/summary.md" class="text-link">Markdown summary</a>
+          </div>
+          <div id="database-top-relations"></div>
+        </section>
+      </section>
+
+      <section id="screenshots" class="panel" role="tabpanel" aria-labelledby="tab-screenshots" tabindex="0" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">playwright evidence</p>
+            <h2 id="screenshots-heading">E2E Screenshot Catalogue</h2>
+          </div>
+          <div class="section-heading-links">
+            <a href="/screenshots/application-library/" class="text-link">Static index</a>
+            <a href="/screenshots/application-library/manifest.json" class="text-link">Raw manifest JSON</a>
+          </div>
+        </div>
+        <div class="toolbar screenshot-toolbar">
+          <label>
+            <span>Search</span>
+            <input id="screenshot-search" type="search" placeholder="route, group, label...">
+          </label>
+          <label>
+            <span>Group</span>
+            <select id="screenshot-group"></select>
+          </label>
+          <label>
+            <span>Locale</span>
+            <select id="screenshot-locale"></select>
+          </label>
+          <label>
+            <span>Theme</span>
+            <select id="screenshot-theme"></select>
+          </label>
+        </div>
+        <div id="screenshot-chips" class="filter-chips" data-panel-chips="screenshots"></div>
+        <p id="screenshot-result-count" class="result-count" aria-live="polite"></p>
+        <div id="screenshot-results" class="screenshot-grid"></div>
+      </section>
+
+      <section id="reference" class="panel" role="tabpanel" aria-labelledby="tab-reference" tabindex="0" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">curated docs</p>
+            <h2 id="reference-heading">Developer Reference Shelf</h2>
+          </div>
+          <p class="muted">Mirrored from the local Parthenon checkout by <code>scripts/sync-reference.sh</code>.</p>
+        </div>
+        <div id="reference-summary" class="reference-summary" aria-live="polite"></div>
+        <div class="toolbar reference-toolbar">
+          <label>
+            <span>Search</span>
+            <input id="reference-search" type="search" placeholder="auth, deploy, study, route, checksum...">
+          </label>
+          <label>
+            <span>Group</span>
+            <select id="reference-group"></select>
+          </label>
+          <label>
+            <span>Tag</span>
+            <select id="reference-tag"></select>
+          </label>
+          <label>
+            <span>Criticality</span>
+            <select id="reference-criticality"></select>
+          </label>
+          <label>
+            <span>Source Area</span>
+            <select id="reference-source-area"></select>
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="reference-status"></select>
+          </label>
+        </div>
+        <div id="reference-chips" class="filter-chips" data-panel-chips="reference"></div>
+        <p id="reference-result-count" class="result-count" aria-live="polite"></p>
+        <div id="reference-results" class="data-grid"></div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Parthenon Developer Portal</span>
+      <nav class="footer-links" aria-label="Footer resources">
+        <a href="#overview" data-tab-link="overview">Overview</a>
+        <a href="#graphs" data-tab-link="graphs">Graphs</a>
+        <a href="#database" data-tab-link="database">Database</a>
+        <a href="#screenshots" data-tab-link="screenshots">Screenshots</a>
+        <a href="#reference" data-tab-link="reference">Reference</a>
+      </nav>
+      <span>Static Apache vhost with curated local assets only.</span>
+      <span class="build-stamp" id="build-stamp">Build info loading…</span>
+    </footer>
+
+    <div id="help-modal" class="modal-backdrop" hidden>
+      <section class="reference-modal help-modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
+        <header class="modal-header">
+          <div>
+            <p class="eyebrow">help</p>
+            <h2 id="help-modal-title">Keyboard Shortcuts</h2>
+          </div>
+          <button id="help-modal-close" class="icon-button" type="button" aria-label="Close help">Close</button>
+        </header>
+        <div class="help-modal-content">
+          <dl>
+            <dt>/</dt><dd>Focus unified search</dd>
+            <dt>?</dt><dd>Show this help</dd>
+            <dt>g o</dt><dd>Go to Overview</dd>
+            <dt>g g</dt><dd>Go to Graphs</dd>
+            <dt>g d</dt><dd>Go to Database</dd>
+            <dt>g s</dt><dd>Go to Screenshots</dd>
+            <dt>g r</dt><dd>Go to Reference</dd>
+            <dt>← / →</dt><dd>In tabs: previous / next tab. In modal: previous / next item.</dd>
+            <dt>Home / End</dt><dd>First / last tab</dd>
+            <dt>Esc</dt><dd>Close modal or clear focused search</dd>
+          </dl>
+        </div>
+      </section>
+    </div>
+
+    <div id="screenshot-modal" class="modal-backdrop" hidden>
+      <section class="screenshot-modal" role="dialog" aria-modal="true" aria-labelledby="screenshot-modal-title">
+        <header class="modal-header">
+          <div>
+            <p class="eyebrow">visual evidence</p>
+            <h2 id="screenshot-modal-title">Screenshot Preview</h2>
+          </div>
+          <div class="modal-controls">
+            <div class="modal-nav" data-modal-nav="screenshot">
+              <button type="button" data-modal-nav-prev aria-label="Previous screenshot (←)">◂</button>
+              <span class="modal-nav-position" data-modal-nav-position>—</span>
+              <button type="button" data-modal-nav-next aria-label="Next screenshot (→)">▸</button>
+            </div>
+            <div class="zoom-controls" role="group" aria-label="Zoom level">
+              <button type="button" data-zoom="fit" aria-pressed="true">fit</button>
+              <button type="button" data-zoom="100" aria-pressed="false">100%</button>
+              <button type="button" data-zoom="200" aria-pressed="false">200%</button>
+            </div>
+            <button id="screenshot-modal-close" class="icon-button" type="button" aria-label="Close screenshot preview">Close</button>
+          </div>
+        </header>
+        <div class="modal-body">
+          <figure>
+            <img id="screenshot-modal-image" src="" alt="">
+          </figure>
+          <aside class="modal-details">
+            <dl>
+              <div>
+                <dt>Route</dt>
+                <dd id="screenshot-modal-route">--</dd>
+              </div>
+              <div>
+                <dt>Locale</dt>
+                <dd id="screenshot-modal-locale">--</dd>
+              </div>
+              <div>
+                <dt>Theme</dt>
+                <dd id="screenshot-modal-theme">--</dd>
+              </div>
+              <div>
+                <dt>Captured</dt>
+                <dd id="screenshot-modal-captured">--</dd>
+              </div>
+            </dl>
+            <div id="screenshot-modal-actions" class="card-actions stacked"></div>
+          </aside>
+        </div>
+      </section>
+    </div>
+
+    <div id="reference-modal" class="modal-backdrop" hidden>
+      <section class="reference-modal" role="dialog" aria-modal="true" aria-labelledby="reference-modal-title">
+        <header class="modal-header">
+          <div>
+            <p class="eyebrow">reference asset</p>
+            <h2 id="reference-modal-title">Reference Preview</h2>
+            <p id="reference-modal-summary" class="muted"></p>
+          </div>
+          <div class="modal-controls">
+            <div class="modal-nav" data-modal-nav="reference">
+              <button type="button" data-modal-nav-prev aria-label="Previous reference (←)">◂</button>
+              <span class="modal-nav-position" data-modal-nav-position>—</span>
+              <button type="button" data-modal-nav-next aria-label="Next reference (→)">▸</button>
+            </div>
+            <button id="reference-modal-close" class="icon-button" type="button" aria-label="Close reference preview">Close</button>
+          </div>
+        </header>
+        <div class="modal-body">
+          <article id="reference-modal-content" class="markdown-preview"></article>
+          <aside class="modal-details">
+            <dl>
+              <div>
+                <dt>Source</dt>
+                <dd id="reference-modal-source">--</dd>
+              </div>
+              <div>
+                <dt>Criticality</dt>
+                <dd id="reference-modal-criticality">--</dd>
+              </div>
+              <div>
+                <dt>Status</dt>
+                <dd id="reference-modal-status">--</dd>
+              </div>
+              <div>
+                <dt>Updated</dt>
+                <dd id="reference-modal-updated">--</dd>
+              </div>
+              <div>
+                <dt>Checksum</dt>
+                <dd id="reference-modal-checksum">--</dd>
+              </div>
+            </dl>
+            <div id="reference-modal-tags" class="meta-row"></div>
+            <div id="reference-modal-related" class="card-actions stacked"></div>
+          </aside>
+        </div>
+      </section>
+    </div>
+
+    <script src="/assets/app.js" defer></script>
+  </body>
+</html>
