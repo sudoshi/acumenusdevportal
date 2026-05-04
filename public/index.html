@@ -7,6 +7,7 @@
     <title>Parthenon Developer Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="image" href="/assets/backgrounds/bg-01.webp" fetchpriority="high">
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Source+Serif+4:wght@400;600&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script>
       (function(){
@@ -430,6 +431,13 @@
           </aside>
         </div>
       </section>
+    </div>
+
+    <div id="refresh-toast" class="refresh-toast" role="status" aria-live="polite" hidden>
+      <span class="refresh-toast-icon" aria-hidden="true">↻</span>
+      <span class="refresh-toast-text">New portal content available</span>
+      <button id="refresh-toast-action" class="refresh-toast-button" type="button">Refresh</button>
+      <button id="refresh-toast-dismiss" class="refresh-toast-dismiss" type="button" aria-label="Dismiss new content notice">×</button>
     </div>
 
     <script src="/assets/app.js" defer></script>

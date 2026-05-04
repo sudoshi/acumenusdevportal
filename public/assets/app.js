@@ -32,6 +32,9 @@ const state = {
   keyboardSequence: null,
   keyboardSequenceTimer: null,
   buildInfo: null,
+  buildInfoSeenAt: null,
+  buildInfoLatestSeen: null,
+  buildPollHandle: null,
 };
 
 const FILTER_KEYS = {
@@ -506,6 +509,13 @@ function updateBreadcrumb(tabName) {
 }
 
 function activateTab(tabName, options = {}) {
+  // Close any open modal before switching tabs so the user doesn't end
+  // up on a different panel hidden behind a stale modal. Each close fn
+  // is a no-op if its modal is already hidden, so calling all three is
+  // safe and idempotent.
+  closeScreenshotModal();
+  closeReferenceModal();
+  closeHelpModal();
   $$(".tab").forEach((tab) => {
     const isActive = tab.dataset.tab === tabName;
     tab.classList.toggle("active", isActive);
@@ -1167,6 +1177,50 @@ function updateScreenshotModalNav() {
   if (next) next.disabled = state.screenshotModalIndex >= list.length - 1;
 }
 
+// Focus-trap utilities — keep keyboard focus inside an open modal so
+// Tab cycles through the modal's controls instead of leaking back to
+// the page behind it. Re-queries focusables on every Tab keydown so
+// async-loaded content (markdown link previews, fetched related-link
+// blocks) participates correctly.
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
+
+function trapFocus(modal) {
+  if (!modal) return;
+  // Idempotent: if already trapped, leave the existing handler in place.
+  if (modal._focusTrapHandler) return;
+  const handler = (event) => {
+    if (event.key !== "Tab") return;
+    const focusables = Array.from(modal.querySelectorAll(FOCUSABLE_SELECTOR))
+      .filter((el) => el.offsetParent !== null && !el.hasAttribute("disabled"));
+    if (!focusables.length) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement;
+    if (event.shiftKey && (active === first || !modal.contains(active))) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && (active === last || !modal.contains(active))) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+  modal.addEventListener("keydown", handler);
+  modal._focusTrapHandler = handler;
+}
+
+function releaseFocusTrap(modal) {
+  if (!modal || !modal._focusTrapHandler) return;
+  modal.removeEventListener("keydown", modal._focusTrapHandler);
+  delete modal._focusTrapHandler;
+}
+
 function openScreenshotModal(file) {
   const entry = findScreenshotByFile(file);
   const modal = $("#screenshot-modal");
@@ -1184,6 +1238,7 @@ function openScreenshotModal(file) {
   document.body.classList.add("modal-open");
   setScreenshotZoom(state.screenshotZoom || "fit");
   updateScreenshotModalNav();
+  trapFocus(modal);
   $("#screenshot-modal-close")?.focus();
 }
 
@@ -1203,11 +1258,13 @@ function populateScreenshotModal(entry) {
   setText("#screenshot-modal-theme", entry.theme || "Unknown");
   setText("#screenshot-modal-captured", formatDateTime(entry.capturedAt));
 
+  const liveRoute = entry.route ? liveHref(entry.route) : null;
   const actions = $("#screenshot-modal-actions");
   if (actions) {
     actions.innerHTML = `
       <a href="${escapeAttribute(imageHref)}">Open image</a>
       <a href="${escapeAttribute(catalogueHref)}">Open catalogue item</a>
+      ${liveRoute ? `<a href="${escapeAttribute(liveRoute)}" class="external" target="_blank" rel="noopener noreferrer">Open live route</a>` : ""}
     `;
   }
 }
@@ -1228,6 +1285,7 @@ function closeScreenshotModal() {
   if (!modal || modal.hidden) {
     return;
   }
+  releaseFocusTrap(modal);
   modal.hidden = true;
   if (image) {
     image.src = "";
@@ -1459,6 +1517,7 @@ async function openReferenceModal(id) {
 
   modal.hidden = false;
   document.body.classList.add("modal-open");
+  trapFocus(modal);
   $("#reference-modal-close")?.focus();
   updateReferenceModalNav();
   await populateReferenceModal(doc);
@@ -1479,6 +1538,7 @@ function closeReferenceModal() {
   if (!modal || modal.hidden) {
     return;
   }
+  releaseFocusTrap(modal);
   modal.hidden = true;
   document.body.classList.remove("modal-open");
   if (state.lastFocusedElement && typeof state.lastFocusedElement.focus === "function") {
@@ -1531,12 +1591,14 @@ function openHelpModal() {
   state.lastFocusedElement = document.activeElement;
   modal.hidden = false;
   document.body.classList.add("modal-open");
+  trapFocus(modal);
   $("#help-modal-close")?.focus();
 }
 
 function closeHelpModal() {
   const modal = $("#help-modal");
   if (!modal || modal.hidden) return;
+  releaseFocusTrap(modal);
   modal.hidden = true;
   document.body.classList.remove("modal-open");
   if (state.lastFocusedElement && typeof state.lastFocusedElement.focus === "function") {
@@ -1571,10 +1633,54 @@ async function fetchBuildInfo() {
     const response = await fetch("/build-info.json", { cache: "no-store" });
     if (response.ok) {
       state.buildInfo = await response.json();
+      // Capture the timestamp we initially loaded so the polling pass
+      // can detect future changes.
+      state.buildInfoSeenAt = state.buildInfo?.generatedAt || null;
     }
   } catch (error) {
     // build-info.json is optional
   }
+}
+
+const BUILD_POLL_INTERVAL_MS = 5 * 60 * 1000; // 5 min
+
+async function pollBuildInfo() {
+  if (document.hidden) return;
+  if (!state.buildInfoSeenAt) return; // never had a baseline; nothing to compare to
+  try {
+    const response = await fetch("/build-info.json", { cache: "no-store" });
+    if (!response.ok) return;
+    const fresh = await response.json();
+    if (!fresh || !fresh.generatedAt) return;
+    if (fresh.generatedAt > state.buildInfoSeenAt) {
+      state.buildInfoLatestSeen = fresh.generatedAt;
+      const toast = $("#refresh-toast");
+      if (toast) toast.hidden = false;
+    }
+  } catch (error) {
+    // network blip — try again next interval
+  }
+}
+
+function startBuildInfoPolling() {
+  if (state.buildPollHandle) return;
+  state.buildPollHandle = window.setInterval(pollBuildInfo, BUILD_POLL_INTERVAL_MS);
+}
+
+function dismissRefreshToast() {
+  const toast = $("#refresh-toast");
+  if (toast) toast.hidden = true;
+  // Treat dismissal as acknowledgement of the latest version we saw,
+  // so we won't re-show the toast for the same build. A still-newer
+  // build later will surface the toast again.
+  if (state.buildInfoLatestSeen) {
+    state.buildInfoSeenAt = state.buildInfoLatestSeen;
+    state.buildInfoLatestSeen = null;
+  }
+}
+
+function triggerRefresh() {
+  window.location.reload();
 }
 
 function renderBuildStamp() {
@@ -1780,6 +1886,8 @@ function bindEvents() {
   $("#help-toggle")?.addEventListener("click", openHelpModal);
   $("#help-modal-close")?.addEventListener("click", closeHelpModal);
   $("#whats-new-dismiss")?.addEventListener("click", dismissWhatsNew);
+  $("#refresh-toast-action")?.addEventListener("click", triggerRefresh);
+  $("#refresh-toast-dismiss")?.addEventListener("click", dismissRefreshToast);
 
   const bindSearchDebounced = (selector, key, render) => {
     const el = $(selector);
@@ -1974,6 +2082,7 @@ async function init() {
     updateBreadcrumb("overview");
   }
   window.scrollTo(0, 0);
+  startBuildInfoPolling();
 }
 
 init();
@@ -2016,7 +2125,10 @@ async function startBackgroundCycle() {
   const layerB = document.querySelector('[data-bg-layer="b"]');
   if (!layerA || !layerB) return;
 
-  const order = shuffled(BG_IMAGES);
+  // Lock the first frame to bg-01 so the <link rel="preload"> in the
+  // document head can warm the cache. Shuffle the remaining 7 so the
+  // mid-session cycle still feels random.
+  const order = [BG_IMAGES[0], ...shuffled(BG_IMAGES.slice(1))];
   let index = 0;
   let visibleLayer = layerA;
   let hiddenLayer = layerB;

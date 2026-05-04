@@ -399,7 +399,8 @@ code {
 }
 
 .button.external::after,
-.footer-links a.external::after {
+.footer-links a.external::after,
+.card-actions a.external::after {
   content: " ↗";
   font-size: 0.85em;
   margin-left: 2px;
@@ -2223,6 +2224,114 @@ footer::before {
   color: var(--text-primary);
   border-color: var(--accent);
   outline: none;
+}
+
+/* Hot-refresh toast — fixed pill in the bottom-right that announces a
+   newer build of the portal is available. Glass-styled to match the
+   overall chrome, but compact so it stays out of the way. */
+.refresh-toast {
+  position: fixed;
+  right: clamp(var(--space-4), 3vw, var(--space-6));
+  bottom: clamp(var(--space-4), 3vw, var(--space-6));
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--glass-shadow-deep), 0 0 0 1px var(--glass-spec) inset;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  animation: refresh-toast-rise 240ms var(--ease-smooth);
+}
+
+.refresh-toast[hidden] {
+  display: none;
+}
+
+@keyframes refresh-toast-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.refresh-toast-icon {
+  display: inline-block;
+  font-size: var(--text-base);
+  color: var(--accent-light);
+  animation: refresh-toast-spin 4s linear infinite;
+}
+
+@keyframes refresh-toast-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.refresh-toast-text {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.refresh-toast-button {
+  appearance: none;
+  border: 1px solid var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent-light);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  padding: 4px var(--space-3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.refresh-toast-button:hover,
+.refresh-toast-button:focus-visible {
+  background: var(--accent);
+  color: #08080A;
+  outline: none;
+}
+
+.refresh-toast-dismiss {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--text-lg);
+  font-weight: 400;
+  line-height: 1;
+  padding: 0 var(--space-1);
+  cursor: pointer;
+}
+
+.refresh-toast-dismiss:hover,
+.refresh-toast-dismiss:focus-visible {
+  color: var(--text-primary);
+  outline: none;
+}
+
+@media (max-width: 760px) {
+  .refresh-toast {
+    left: var(--space-3);
+    right: var(--space-3);
+    justify-content: space-between;
+  }
+  .refresh-toast-text {
+    flex: 1;
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refresh-toast-icon {
+    animation: none !important;
+  }
+  .refresh-toast {
+    animation: none !important;
+  }
 }
 
 .search-hint {
