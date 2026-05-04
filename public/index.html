@@ -33,23 +33,18 @@
     </div>
 
     <header class="site-header">
-      <div>
-        <nav class="breadcrumbs" aria-label="Portal context">
-          <a href="/">Developer portal</a>
-          <span>Parthenon</span>
-          <span id="breadcrumb-current" data-breadcrumb-current hidden></span>
-        </nav>
-        <p class="eyebrow">dev.acumenus.net</p>
-        <h1>Parthenon Developer Portal</h1>
-        <p class="lead">
-          Architecture graphs, database analysis, visual regression evidence, reference docs, and live environment links for Parthenon engineering work.
-        </p>
-      </div>
+      <a class="brand" href="/" aria-label="Parthenon Developer Portal home">
+        <span class="brand-mark">Parthenon</span>
+        <span class="brand-context">Developer Portal</span>
+      </a>
+      <nav class="breadcrumbs" aria-label="Portal context">
+        <span id="breadcrumb-current" data-breadcrumb-current hidden></span>
+      </nav>
       <div class="header-actions">
         <nav class="quick-actions" id="runtime-links" aria-label="Live Parthenon resources"></nav>
         <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cycle theme: system, dark, light">
           <span class="theme-indicator" aria-hidden="true"></span>
-          <span id="theme-toggle-label">Dark</span>
+          <span id="theme-toggle-label" class="visually-hidden">Theme</span>
           <span class="theme-mode-label" id="theme-mode-label">system</span>
         </button>
         <button id="help-toggle" class="icon-button" type="button" aria-label="Show keyboard shortcuts (?)" title="Keyboard shortcuts">?</button>
@@ -107,12 +102,11 @@
       </section>
 
       <section id="overview" class="panel active" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">developer map</p>
-            <h2 id="overview-heading">Operational Index</h2>
-          </div>
-          <p id="last-updated" class="muted">Loading asset metadata...</p>
+        <div class="overview-hero">
+          <p class="eyebrow">dev.acumenus.net</p>
+          <h1 id="overview-heading">Parthenon Developer Portal</h1>
+          <p class="lead">Architecture graphs, database analysis, visual regression evidence, reference docs, and live environment links for Parthenon engineering work.</p>
+          <p id="last-updated" class="muted">Loading asset metadata…</p>
         </div>
         <div class="resource-grid">
           <article class="resource-card accent-green">

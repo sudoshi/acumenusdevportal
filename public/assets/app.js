@@ -1518,11 +1518,11 @@ function updateThemeToggle() {
     return;
   }
   const isLight = document.documentElement.classList.contains("light");
-  label.textContent = isLight ? "Light" : "Dark";
+  label.textContent = isLight ? "Light theme active" : "Dark theme active";
   if (modeLabel) {
-    modeLabel.textContent = state.themeMode === "system" ? "(system)" : "";
+    modeLabel.textContent = state.themeMode;
   }
-  button.title = `Theme: ${state.themeMode}. Click to cycle (system → dark → light).`;
+  button.title = `Theme: ${state.themeMode} (resolved: ${isLight ? "light" : "dark"}). Click to cycle (system → dark → light).`;
 }
 
 function openHelpModal() {
