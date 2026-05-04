@@ -1,0 +1,507 @@
+/*
+ * Parthenon retheme for native SchemaSpy / AdminLTE pages.
+ *
+ * Loaded AFTER all SchemaSpy stylesheets so it wins by source order. Scoped
+ * under .parthenon-themed (added to <body> by the post-processor) so it
+ * never bleeds into the SPA portal's own CSS.
+ *
+ * Overrides AdminLTE 2 + Bootstrap 3 chrome, DataTables, and SchemaSpy's
+ * own embedded styles to match the portal's crimson/gold/dark palette.
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+.parthenon-themed {
+  --p-surface: #0E0E11;
+  --p-surface-raised: #151518;
+  --p-surface-overlay: #1C1C20;
+  --p-surface-elevated: #232328;
+  --p-text: #F0EDE8;
+  --p-text-muted: #9D988F;
+  --p-text-ghost: #5A5650;
+  --p-primary: #9B1B30;
+  --p-primary-light: #B82D42;
+  --p-accent: #C9A227;
+  --p-accent-light: #D4B340;
+  --p-accent-bg: rgba(201, 162, 39, 0.10);
+  --p-border: rgba(255, 255, 255, 0.08);
+  --p-border-strong: rgba(255, 255, 255, 0.14);
+  --p-glass-bg: rgba(20, 20, 24, 0.62);
+  --p-glass-bg-strong: rgba(14, 14, 17, 0.78);
+}
+
+html.light .parthenon-themed {
+  --p-surface: #F5F0E8;
+  --p-surface-raised: #FCF8F0;
+  --p-surface-overlay: #EEE8DC;
+  --p-surface-elevated: #FFFFFF;
+  --p-text: #1A1815;
+  --p-text-muted: #5A5650;
+  --p-text-ghost: #8A857D;
+  --p-border: rgba(80, 60, 30, 0.14);
+  --p-border-strong: rgba(80, 60, 30, 0.22);
+  --p-glass-bg: rgba(248, 244, 236, 0.72);
+  --p-glass-bg-strong: rgba(252, 248, 240, 0.84);
+}
+
+/* Page surface — solid base; the SPA's atmosphere photo cycle does not run
+   here, but the body-wide tint matches portal dark/light mode. */
+.parthenon-themed,
+.parthenon-themed body,
+.parthenon-themed .wrapper,
+.parthenon-themed .content-wrapper {
+  background: var(--p-surface) !important;
+  color: var(--p-text) !important;
+  font-family: "Source Sans 3", "Helvetica Neue", sans-serif !important;
+}
+
+/* Portal chrome bar inserted by the post-processor at the very top of body. */
+.parthenon-portal-chrome {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px clamp(16px, 4vw, 32px);
+  background: var(--p-glass-bg-strong);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  border-bottom: 1px solid var(--p-border);
+  font-family: "Source Sans 3", sans-serif;
+  position: relative;
+  z-index: 100;
+}
+
+.parthenon-portal-chrome::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
+  pointer-events: none;
+}
+
+.parthenon-portal-chrome a {
+  color: var(--p-text);
+  text-decoration: none;
+}
+
+.parthenon-portal-chrome .parthenon-brand {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 12px 2px 0;
+  border-right: 1px solid var(--p-border);
+}
+
+.parthenon-portal-chrome .parthenon-brand-mark {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.375rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--p-text);
+}
+
+.parthenon-portal-chrome .parthenon-brand-context {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--p-accent-light);
+}
+
+.parthenon-portal-chrome .parthenon-crumbs {
+  flex: 1;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.875rem;
+  color: var(--p-text-muted);
+}
+
+.parthenon-portal-chrome .parthenon-crumbs a:hover {
+  color: var(--p-accent-light);
+}
+
+.parthenon-portal-chrome .parthenon-crumb-sep {
+  color: var(--p-text-ghost);
+  margin: 0 8px;
+}
+
+.parthenon-portal-chrome .parthenon-crumb-current {
+  color: var(--p-text);
+  font-weight: 600;
+}
+
+/* AdminLTE main-header — slim it down so it sits below the portal chrome
+   without being a competing brand bar. */
+.parthenon-themed .main-header,
+.parthenon-themed .main-header .navbar {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  min-height: 0 !important;
+}
+
+.parthenon-themed .main-header .navbar {
+  padding: 6px 0 !important;
+  border-bottom: 1px solid var(--p-border) !important;
+}
+
+.parthenon-themed .navbar-static-top .container {
+  width: auto !important;
+  max-width: 1480px !important;
+  padding: 0 clamp(16px, 4vw, 32px) !important;
+}
+
+.parthenon-themed .navbar-brand {
+  color: var(--p-text-muted) !important;
+  background: transparent !important;
+  font-family: "IBM Plex Mono", Consolas, monospace !important;
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+  height: auto !important;
+  padding: 12px 16px !important;
+}
+
+.parthenon-themed .navbar-brand b {
+  color: var(--p-text) !important;
+  font-weight: 600 !important;
+}
+
+.parthenon-themed .navbar-nav > li > a {
+  color: var(--p-text-muted) !important;
+  background: transparent !important;
+  font-weight: 500 !important;
+  padding: 12px 14px !important;
+  font-size: 0.9rem !important;
+  border-bottom: 2px solid transparent !important;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+
+.parthenon-themed .navbar-nav > li > a:hover,
+.parthenon-themed .navbar-nav > li > a:focus,
+.parthenon-themed .navbar-nav > .active > a,
+.parthenon-themed .navbar-nav > .active > a:hover {
+  color: var(--p-text) !important;
+  background: transparent !important;
+  border-bottom-color: var(--p-accent) !important;
+}
+
+.parthenon-themed .navbar-toggle {
+  color: var(--p-text-muted) !important;
+  background: transparent !important;
+  border: 1px solid var(--p-border-strong) !important;
+}
+
+/* Content area */
+
+.parthenon-themed .content-header > h1 {
+  font-family: "Source Serif 4", Georgia, serif !important;
+  color: var(--p-text) !important;
+  font-weight: 600 !important;
+  font-size: 1.875rem !important;
+  margin: 24px 0 8px !important;
+}
+
+.parthenon-themed .content-header > h1 small,
+.parthenon-themed .content-header h1 .small {
+  color: var(--p-text-muted) !important;
+}
+
+.parthenon-themed .content,
+.parthenon-themed .content-header {
+  padding: 0 clamp(16px, 4vw, 32px) !important;
+}
+
+.parthenon-themed h1,
+.parthenon-themed h2,
+.parthenon-themed h3,
+.parthenon-themed h4 {
+  font-family: "Source Serif 4", Georgia, serif !important;
+  color: var(--p-text) !important;
+}
+
+.parthenon-themed a {
+  color: var(--p-accent-light);
+}
+
+.parthenon-themed a:hover,
+.parthenon-themed a:focus {
+  color: var(--p-accent) !important;
+}
+
+/* Boxes / cards */
+
+.parthenon-themed .box,
+.parthenon-themed .box.box-solid,
+.parthenon-themed .info-box,
+.parthenon-themed .small-box {
+  background: var(--p-glass-bg) !important;
+  border: 1px solid var(--p-border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.32), 0 1px 4px rgba(0, 0, 0, 0.22) !important;
+  color: var(--p-text) !important;
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.parthenon-themed .box-header {
+  border-bottom: 1px solid var(--p-border) !important;
+  color: var(--p-text) !important;
+  background: transparent !important;
+}
+
+.parthenon-themed .box-header > .box-title {
+  color: var(--p-text) !important;
+  font-family: "Source Serif 4", Georgia, serif !important;
+  font-weight: 600 !important;
+}
+
+.parthenon-themed .box-body {
+  background: transparent !important;
+  color: var(--p-text) !important;
+}
+
+/* Callouts */
+
+.parthenon-themed .callout {
+  background: var(--p-glass-bg) !important;
+  border-radius: 8px !important;
+  color: var(--p-text) !important;
+  border: 1px solid var(--p-border) !important;
+}
+
+.parthenon-themed .callout.callout-info {
+  border-left: 4px solid var(--p-accent) !important;
+}
+
+.parthenon-themed .callout.callout-warning {
+  border-left: 4px solid #E5A84B !important;
+}
+
+.parthenon-themed .callout.callout-danger {
+  border-left: 4px solid var(--p-primary) !important;
+}
+
+.parthenon-themed .callout h4 {
+  color: var(--p-accent-light) !important;
+  font-family: "Source Serif 4", Georgia, serif !important;
+}
+
+.parthenon-themed .callout p,
+.parthenon-themed .callout {
+  color: var(--p-text) !important;
+}
+
+/* Info-boxes (metric cards on index.html) */
+
+.parthenon-themed .info-box-text {
+  color: var(--p-text-muted) !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  font-weight: 600 !important;
+}
+
+.parthenon-themed .info-box-number {
+  color: var(--p-text) !important;
+  font-family: "Source Serif 4", Georgia, serif !important;
+  font-size: 1.75rem !important;
+  font-weight: 600 !important;
+}
+
+.parthenon-themed .info-box-icon {
+  background: var(--p-accent-bg) !important;
+  color: var(--p-accent-light) !important;
+  border-right: 1px solid var(--p-border) !important;
+}
+
+.parthenon-themed .info-box-icon.bg-aqua,
+.parthenon-themed .info-box-icon.bg-teal,
+.parthenon-themed .info-box-icon.bg-yellow,
+.parthenon-themed .info-box-icon.bg-red,
+.parthenon-themed .info-box-icon.bg-green,
+.parthenon-themed .info-box-icon.bg-blue {
+  background: var(--p-accent-bg) !important;
+  color: var(--p-accent-light) !important;
+}
+
+/* Tables */
+
+.parthenon-themed table.table,
+.parthenon-themed table.dataTable {
+  background: transparent !important;
+  color: var(--p-text) !important;
+  border-collapse: collapse !important;
+}
+
+.parthenon-themed table.table > thead > tr > th,
+.parthenon-themed table.dataTable > thead > tr > th,
+.parthenon-themed table.dataTable thead th {
+  background: var(--p-surface-overlay) !important;
+  color: var(--p-text-muted) !important;
+  border-bottom: 1px solid var(--p-border-strong) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase !important;
+  padding: 10px !important;
+}
+
+.parthenon-themed table.table > tbody > tr > td,
+.parthenon-themed table.dataTable > tbody > tr > td,
+.parthenon-themed table.dataTable tbody td {
+  border-top: 1px solid var(--p-border) !important;
+  background: transparent !important;
+  color: var(--p-text) !important;
+  padding: 10px !important;
+  font-size: 0.875rem !important;
+}
+
+.parthenon-themed table.table-hover > tbody > tr:hover > td,
+.parthenon-themed table.dataTable tbody tr:hover > td,
+.parthenon-themed table.dataTable.display tbody tr.odd:hover > td,
+.parthenon-themed table.dataTable.display tbody tr.even:hover > td {
+  background: var(--p-surface-overlay) !important;
+}
+
+.parthenon-themed table.dataTable.display tbody tr.odd > td,
+.parthenon-themed table.dataTable.display tbody tr.even > td,
+.parthenon-themed table.dataTable.stripe tbody tr.odd > td {
+  background: transparent !important;
+}
+
+.parthenon-themed table.table-bordered,
+.parthenon-themed table.table-bordered > thead > tr > th,
+.parthenon-themed table.table-bordered > tbody > tr > td {
+  border: 1px solid var(--p-border) !important;
+}
+
+/* DataTables search + pagination chrome */
+
+.parthenon-themed .dataTables_wrapper .dataTables_filter input,
+.parthenon-themed .dataTables_wrapper .dataTables_length select,
+.parthenon-themed .form-control {
+  background: var(--p-surface-overlay) !important;
+  border: 1px solid var(--p-border) !important;
+  color: var(--p-text) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  padding: 6px 10px !important;
+}
+
+.parthenon-themed .dataTables_wrapper .dataTables_filter input:focus,
+.parthenon-themed .form-control:focus {
+  border-color: var(--p-accent) !important;
+  outline: 2px solid rgba(201, 162, 39, 0.18);
+}
+
+.parthenon-themed .dataTables_wrapper .dataTables_info,
+.parthenon-themed .dataTables_wrapper .dataTables_filter,
+.parthenon-themed .dataTables_wrapper .dataTables_length,
+.parthenon-themed .dataTables_wrapper .dataTables_paginate {
+  color: var(--p-text-muted) !important;
+}
+
+.parthenon-themed .dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: var(--p-text-muted) !important;
+  background: var(--p-surface-overlay) !important;
+  border: 1px solid var(--p-border) !important;
+  border-radius: 4px !important;
+  margin: 0 2px !important;
+}
+
+.parthenon-themed .dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+.parthenon-themed .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: var(--p-accent-bg) !important;
+  border-color: var(--p-accent) !important;
+  color: var(--p-accent-light) !important;
+}
+
+/* Buttons */
+
+.parthenon-themed .btn-default,
+.parthenon-themed .btn-info,
+.parthenon-themed .btn-primary {
+  background: var(--p-surface-overlay) !important;
+  border: 1px solid var(--p-border) !important;
+  color: var(--p-text) !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.parthenon-themed .btn-primary {
+  background: var(--p-primary) !important;
+  border-color: var(--p-primary-light) !important;
+  color: #fff !important;
+}
+
+.parthenon-themed .btn-default:hover,
+.parthenon-themed .btn-info:hover {
+  background: var(--p-surface-elevated) !important;
+  border-color: var(--p-accent) !important;
+  color: var(--p-text) !important;
+}
+
+/* Code / pre / SQL */
+
+.parthenon-themed pre,
+.parthenon-themed code {
+  background: var(--p-surface-overlay) !important;
+  color: var(--p-accent-light) !important;
+  border: 1px solid var(--p-border) !important;
+  border-radius: 4px !important;
+  font-family: "IBM Plex Mono", Consolas, monospace !important;
+}
+
+/* Diagrams (PNG embeds) — soft border so they sit on the dark surface
+   instead of looking like floating cutouts. */
+.parthenon-themed .content img {
+  border: 1px solid var(--p-border) !important;
+  border-radius: 8px !important;
+  background: var(--p-surface-elevated) !important;
+}
+
+/* DataTables small text (entry counts, etc.) */
+.parthenon-themed label {
+  color: var(--p-text-muted) !important;
+  font-weight: 500 !important;
+}
+
+/* Footers / metadata text */
+.parthenon-themed .col-md-12 > p,
+.parthenon-themed .text-muted {
+  color: var(--p-text-muted) !important;
+}
+
+/* Hide the AdminLTE skin-blue header gradient bar that ships with skin-blue. */
+.parthenon-themed .skin-blue .main-header .logo {
+  background: transparent !important;
+}
+
+/* CodeMirror (anomalies / routines pages) */
+.parthenon-themed .CodeMirror {
+  background: var(--p-surface-overlay) !important;
+  color: var(--p-text) !important;
+  border: 1px solid var(--p-border) !important;
+  border-radius: 6px !important;
+  font-family: "IBM Plex Mono", Consolas, monospace !important;
+}
+
+.parthenon-themed .CodeMirror-gutters {
+  background: var(--p-surface) !important;
+  border-right: 1px solid var(--p-border) !important;
+}
+
+.parthenon-themed .CodeMirror-linenumber {
+  color: var(--p-text-ghost) !important;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .parthenon-themed .box,
+  .parthenon-themed .info-box,
+  .parthenon-portal-chrome {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--p-surface-raised) !important;
+  }
+}

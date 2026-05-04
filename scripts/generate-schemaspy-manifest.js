@@ -212,7 +212,7 @@ function makeAnalysisHtml(schema) {
   `).join("");
 
   const criticalAssets = schema.criticalAssets.map((asset) => `<li>${htmlEscape(asset)}</li>`).join("");
-  const links = schema.links.map((link) => `<a href="${htmlEscape(link.href)}">${htmlEscape(link.label)}</a>`).join("");
+  const links = schema.links.map((link) => `<a href="${htmlEscape(link.href)}" class="button">${htmlEscape(link.label)}</a>`).join("");
 
   return `<!doctype html>
 <html lang="en">
@@ -221,23 +221,37 @@ function makeAnalysisHtml(schema) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex,nofollow">
     <title>${htmlEscape(schema.title)} - Parthenon Database Analysis</title>
+    <script>
+      (function(){
+        var stored=localStorage.getItem('parthenon-theme');
+        var mode=stored||'system';
+        var effective=(mode==='light')?'light':(mode==='dark')?'dark':((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');
+        if(effective==='light'){document.documentElement.classList.add('light');}
+      })();
+    </script>
     <link rel="stylesheet" href="/assets/styles.css">
   </head>
   <body>
-    <header class="site-header compact-header">
-      <div>
-        <nav class="breadcrumbs" aria-label="Portal context">
-          <a href="/">Developer portal</a>
-          <a href="/schemaspy/">Database</a>
-          <span>${htmlEscape(schema.name)}</span>
-        </nav>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Parthenon Developer Portal home">
+        <span class="brand-mark">Parthenon</span>
+        <span class="brand-context">Developer Portal</span>
+      </a>
+      <nav class="breadcrumbs" aria-label="Portal context">
+        <a href="/#database">Database</a>
+        <span class="crumb-sep" aria-hidden="true">›</span>
+        <span class="crumb-current">${htmlEscape(schema.name)}</span>
+      </nav>
+      <div class="header-actions">
+        <nav class="quick-actions" aria-label="Schema report links">${links}</nav>
+      </div>
+    </header>
+    <main>
+      <div class="page-hero">
         <p class="eyebrow">database analysis</p>
         <h1>${htmlEscape(schema.title)}</h1>
         <p class="lead">${htmlEscape(schema.purpose)}</p>
       </div>
-      <nav class="quick-actions" aria-label="Schema report links">${links}</nav>
-    </header>
-    <main>
       <section class="reference-summary" aria-label="Schema summary">
         <span>${formatNumber(schema.tables)} tables</span>
         <span>${formatNumber(schema.views)} views</span>
@@ -358,25 +372,38 @@ function makeIndexHtml(manifest) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex,nofollow">
     <title>Parthenon Database Analysis</title>
+    <script>
+      (function(){
+        var stored=localStorage.getItem('parthenon-theme');
+        var mode=stored||'system';
+        var effective=(mode==='light')?'light':(mode==='dark')?'dark':((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');
+        if(effective==='light'){document.documentElement.classList.add('light');}
+      })();
+    </script>
     <link rel="stylesheet" href="/assets/styles.css">
   </head>
   <body>
-    <header class="site-header compact-header">
-      <div>
-        <nav class="breadcrumbs" aria-label="Portal context">
-          <a href="/">Developer portal</a>
-          <span>Database</span>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Parthenon Developer Portal home">
+        <span class="brand-mark">Parthenon</span>
+        <span class="brand-context">Developer Portal</span>
+      </a>
+      <nav class="breadcrumbs" aria-label="Portal context">
+        <span class="crumb-current">Database</span>
+      </nav>
+      <div class="header-actions">
+        <nav class="quick-actions" aria-label="Database resources">
+          <a href="/schemaspy/manifest.json" class="button">Manifest JSON</a>
+          <a href="/" class="button">Portal</a>
         </nav>
+      </div>
+    </header>
+    <main>
+      <div class="page-hero">
         <p class="eyebrow">schemaspy</p>
         <h1>Parthenon Database Analysis</h1>
         <p class="lead">SchemaSpy reports and PostgreSQL catalog analysis for the local ${htmlEscape(manifest.database)} database on ${htmlEscape(manifest.host)}:${htmlEscape(manifest.port)}.</p>
       </div>
-      <nav class="quick-actions" aria-label="Database resources">
-        <a href="/schemaspy/manifest.json" class="button">Manifest JSON</a>
-        <a href="/" class="button secondary">Portal</a>
-      </nav>
-    </header>
-    <main>
       <section class="reference-summary" aria-label="Database summary">
         <span>${formatNumber(manifest.schemaCount)} schemas</span>
         <span>${formatNumber(manifest.tableCount)} tables</span>

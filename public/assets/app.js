@@ -86,7 +86,7 @@ const runtimeLinks = [
   ["Live app", "https://parthenon.acumenus.net/"],
   ["Documentation", "https://parthenon.acumenus.net/docs/"],
   ["API docs", "https://parthenon.acumenus.net/docs/api"],
-  ["Jobs dashboard", "https://parthenon.acumenus.net/jobs"],
+  ["GitHub", "https://github.com/sudoshi/Parthenon"],
   ["Public installer", "https://parthenon.acumenus.net/install/"],
 ];
 

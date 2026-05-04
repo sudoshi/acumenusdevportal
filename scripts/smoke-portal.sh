@@ -117,6 +117,7 @@ repair_permissions
 
 require_file "${public_root}/index.html"
 require_file "${public_root}/assets/styles.css"
+require_file "${public_root}/assets/schemaspy-portal.css"
 require_file "${public_root}/assets/app.js"
 require_file "${public_root}/build-info.json"
 require_file "${public_root}/graphify/catalog.json"

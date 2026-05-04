@@ -104,6 +104,9 @@ SCHEMASPY_DB_USER="${db_user}" \
 SCHEMASPY_DB_PASSWORD="${db_password}" \
   node "${portal_root}/scripts/generate-schemaspy-manifest.js"
 
+# Retheme native SchemaSpy / AdminLTE pages to match the portal design system.
+node "${portal_root}/scripts/post-process-schemaspy.js"
+
 find "${schemaspy_root}" -type d -exec chmod 0755 {} +
 find "${schemaspy_root}" -type f -exec chmod 0644 {} +
 

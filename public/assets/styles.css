@@ -441,6 +441,37 @@ code {
   font-size: var(--text-sm);
 }
 
+/* Shared hero block for static pages outside the SPA — keeps the
+   slim chrome header free of page-specific titles while still giving
+   each page a strong H1 + lead. */
+.page-hero {
+  margin: 0 0 var(--space-6);
+  padding: clamp(var(--space-2), 2vw, var(--space-4)) 0;
+}
+
+.page-hero h1 {
+  margin-top: var(--space-2);
+  font-size: clamp(var(--text-2xl), 3vw, var(--text-3xl));
+  max-width: 24ch;
+}
+
+.page-hero .lead {
+  max-width: 72ch;
+}
+
+/* Static-page breadcrumbs need explicit separators because the SPA's
+   #breadcrumb-current rule only handles the single-current-tab case. */
+.breadcrumbs .crumb-sep {
+  color: var(--text-ghost);
+  font-weight: 400;
+  user-select: none;
+}
+
+.breadcrumbs .crumb-current {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
 .eyebrow,
 .card-kicker {
   margin: 0 0 var(--space-2);
