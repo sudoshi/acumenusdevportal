@@ -1949,6 +1949,10 @@ function renderAll() {
 }
 
 async function init() {
+  // Manage our own scroll position; don't restore prior session scroll.
+  if ("scrollRestoration" in history) {
+    history.scrollRestoration = "manual";
+  }
   applyThemeMode(state.themeMode);
   bindEvents();
   renderRuntimeLinks();
@@ -1965,10 +1969,11 @@ async function init() {
   evaluateWhatsNew();
   const { tab: requestedTab } = parseUrlHash();
   if (isValidTab(requestedTab)) {
-    activateTab(requestedTab, { replace: true });
+    activateTab(requestedTab, { replace: true, scroll: false });
   } else {
     updateBreadcrumb("overview");
   }
+  window.scrollTo(0, 0);
 }
 
 init();

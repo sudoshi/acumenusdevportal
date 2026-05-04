@@ -330,7 +330,7 @@ code {
 
 .brand-mark {
   font-family: var(--font-heading);
-  font-size: var(--text-xl);
+  font-size: var(--text-2xl);
   font-weight: 600;
   line-height: 1;
   color: var(--text-primary);
@@ -338,7 +338,7 @@ code {
 }
 
 .brand-context {
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -356,7 +356,7 @@ code {
   flex: 1;
   min-width: 0;
   color: var(--text-muted);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   font-weight: 500;
   font-family: var(--font-mono);
 }
@@ -590,9 +590,9 @@ h3 {
 }
 
 .site-header .quick-actions a.button {
-  min-height: 26px;
-  padding: 4px var(--space-2);
-  font-size: var(--text-xs);
+  min-height: 32px;
+  padding: 6px var(--space-3);
+  font-size: var(--text-base);
   font-weight: 500;
   letter-spacing: 0.02em;
   background: transparent;
@@ -610,9 +610,9 @@ h3 {
 }
 
 .site-header .theme-toggle {
-  min-height: 28px;
-  padding: 4px var(--space-2);
-  font-size: var(--text-xs);
+  min-height: 32px;
+  padding: 6px var(--space-3);
+  font-size: var(--text-base);
   background: transparent;
   border-color: transparent;
   color: var(--text-muted);
@@ -628,10 +628,10 @@ h3 {
 }
 
 .site-header .icon-button {
-  min-height: 28px;
-  width: 28px;
+  min-height: 32px;
+  width: 32px;
   padding: 0;
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
   font-family: var(--font-mono);
   background: transparent;
   border-color: transparent;
@@ -648,13 +648,13 @@ h3 {
 }
 
 .site-header .theme-indicator {
-  width: 9px;
-  height: 9px;
+  width: 11px;
+  height: 11px;
   margin-right: 6px;
 }
 
 .site-header .theme-mode-label {
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   margin-left: 4px;
   color: var(--text-ghost);
 }
