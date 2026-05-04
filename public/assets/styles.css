@@ -230,9 +230,9 @@ body > footer {
 
 html.light .atmosphere-tint {
   background:
-    radial-gradient(ellipse at 30% 20%, rgba(122, 21, 38, 0.06) 0%, transparent 55%),
-    radial-gradient(ellipse at 75% 80%, rgba(139, 112, 24, 0.04) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(248, 244, 236, 0.78) 0%, rgba(238, 232, 220, 0.86) 100%);
+    radial-gradient(ellipse at 30% 20%, rgba(122, 21, 38, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 80%, rgba(139, 112, 24, 0.06) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(248, 244, 236, 0.88) 0%, rgba(238, 232, 220, 0.94) 100%);
 }
 
 .atmosphere-vignette {
@@ -1975,7 +1975,6 @@ footer::before {
     padding-inline: var(--space-4);
   }
 
-  .status-strip,
   .resource-grid,
   .data-grid,
   .screenshot-grid,
@@ -1987,6 +1986,46 @@ footer::before {
   .global-result-grid,
   .global-search-box {
     grid-template-columns: 1fr;
+  }
+
+  /* Status strip on mobile collapses from 5 stacked tiles into a single
+     wrapping inline row of "{count} {label}" pairs — keeps the metrics
+     scannable without eating the first viewport. */
+  .status-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    padding: var(--space-3);
+    grid-template-columns: none;
+  }
+
+  .status-strip article,
+  .status-strip .status-card {
+    flex: 0 0 auto;
+    padding: 2px 6px;
+    background: transparent;
+  }
+
+  .status-strip .status-card:hover {
+    background: var(--glass-bg-hover);
+    border-radius: var(--radius-xs);
+  }
+
+  .status-strip .metric {
+    display: inline;
+    font-size: var(--text-base);
+    line-height: 1;
+    margin-right: 4px;
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  .status-strip .label {
+    display: inline;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: 0;
+    text-transform: lowercase;
   }
 
   .section-heading,
@@ -2237,6 +2276,20 @@ footer::before {
 .whats-new-banner .whats-new-content strong {
   color: var(--accent-light);
   font-weight: 600;
+}
+
+.whats-new-banner .whats-new-content kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  margin: 0 2px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xs);
+  background: var(--surface-overlay);
+  color: var(--accent-light);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  font-weight: 500;
+  line-height: 1;
 }
 
 .whats-new-banner button {

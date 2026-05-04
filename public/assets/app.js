@@ -1160,6 +1160,14 @@ function setScreenshotZoom(level) {
   });
 }
 
+function describeActiveFilters(panel) {
+  const keys = FILTER_KEYS[panel] || [];
+  const active = keys
+    .filter((key) => state[key] !== FILTER_DEFAULTS[key] && state[key] !== "")
+    .map((key) => `${FILTER_LABELS[key] || key}=${state[key]}`);
+  return active;
+}
+
 function updateScreenshotModalNav() {
   const list = getScreenshotNavList();
   const position = document.querySelector('#screenshot-modal [data-modal-nav-position]');
@@ -1168,11 +1176,19 @@ function updateScreenshotModalNav() {
   if (!position) return;
   if (state.screenshotModalIndex < 0 || !list.length) {
     position.textContent = "—";
+    position.removeAttribute("title");
     if (prev) prev.disabled = true;
     if (next) next.disabled = true;
     return;
   }
-  position.textContent = `${state.screenshotModalIndex + 1} of ${list.length}`;
+  const active = describeActiveFilters("screenshots");
+  const suffix = active.length ? " · filtered" : "";
+  position.textContent = `${state.screenshotModalIndex + 1} of ${list.length}${suffix}`;
+  if (active.length) {
+    position.title = `Walking the filtered list — ${active.join(", ")}`;
+  } else {
+    position.removeAttribute("title");
+  }
   if (prev) prev.disabled = state.screenshotModalIndex <= 0;
   if (next) next.disabled = state.screenshotModalIndex >= list.length - 1;
 }
@@ -1442,11 +1458,19 @@ function updateReferenceModalNav() {
   if (!position) return;
   if (state.referenceModalIndex < 0 || !list.length) {
     position.textContent = "—";
+    position.removeAttribute("title");
     if (prev) prev.disabled = true;
     if (next) next.disabled = true;
     return;
   }
-  position.textContent = `${state.referenceModalIndex + 1} of ${list.length}`;
+  const active = describeActiveFilters("reference");
+  const suffix = active.length ? " · filtered" : "";
+  position.textContent = `${state.referenceModalIndex + 1} of ${list.length}${suffix}`;
+  if (active.length) {
+    position.title = `Walking the filtered list — ${active.join(", ")}`;
+  } else {
+    position.removeAttribute("title");
+  }
   if (prev) prev.disabled = state.referenceModalIndex <= 0;
   if (next) next.disabled = state.referenceModalIndex >= list.length - 1;
 }
@@ -1716,8 +1740,11 @@ function evaluateWhatsNew() {
   const lastVisitRaw = localStorage.getItem("parthenon-last-visit");
   const lastVisit = lastVisitRaw ? Number(lastVisitRaw) : 0;
   if (!lastVisit) {
-    // First visit — set baseline silently
-    localStorage.setItem("parthenon-last-visit", String(Date.now()));
+    // First visit — surface the keyboard shortcut affordance instead of
+    // setting the baseline silently. dismissWhatsNew() will set the
+    // baseline when the user dismisses, so the welcome only appears once.
+    content.innerHTML = `Welcome — press <kbd>/</kbd> to search, <kbd>?</kbd> for keyboard shortcuts.`;
+    banner.hidden = false;
     return;
   }
   const newScreenshots = (state.screenshots?.entries || [])

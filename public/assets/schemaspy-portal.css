@@ -28,6 +28,8 @@
   --p-border-strong: rgba(255, 255, 255, 0.14);
   --p-glass-bg: rgba(20, 20, 24, 0.62);
   --p-glass-bg-strong: rgba(14, 14, 17, 0.78);
+  --p-spec: rgba(255, 255, 255, 0.10);
+  --p-shadow-soft: 0 6px 24px rgba(0, 0, 0, 0.32), 0 1px 4px rgba(0, 0, 0, 0.22);
 }
 
 html.light .parthenon-themed {
@@ -38,10 +40,17 @@ html.light .parthenon-themed {
   --p-text: #1A1815;
   --p-text-muted: #5A5650;
   --p-text-ghost: #8A857D;
+  --p-primary: #7A1526;
+  --p-primary-light: #9B1B30;
+  --p-accent: #8B7018;
+  --p-accent-light: #6B5510;
+  --p-accent-bg: rgba(139, 112, 24, 0.08);
   --p-border: rgba(80, 60, 30, 0.14);
   --p-border-strong: rgba(80, 60, 30, 0.22);
   --p-glass-bg: rgba(248, 244, 236, 0.72);
   --p-glass-bg-strong: rgba(252, 248, 240, 0.84);
+  --p-spec: rgba(60, 40, 20, 0.08);
+  --p-shadow-soft: 0 6px 24px rgba(60, 40, 20, 0.10), 0 1px 4px rgba(60, 40, 20, 0.06);
 }
 
 /* Page surface — solid base; the SPA's atmosphere photo cycle does not run
@@ -75,7 +84,7 @@ html.light .parthenon-themed {
   position: absolute;
   inset: 0 0 auto 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
+  background: linear-gradient(90deg, transparent, var(--p-spec), transparent);
   pointer-events: none;
 }
 
@@ -236,7 +245,7 @@ html.light .parthenon-themed {
   background: var(--p-glass-bg) !important;
   border: 1px solid var(--p-border) !important;
   border-radius: 12px !important;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.32), 0 1px 4px rgba(0, 0, 0, 0.22) !important;
+  box-shadow: var(--p-shadow-soft) !important;
   color: var(--p-text) !important;
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
