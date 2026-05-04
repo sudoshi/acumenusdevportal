@@ -9,6 +9,49 @@ const portalRoot = path.resolve(__dirname, "..");
 const publicRoot = path.join(portalRoot, "public");
 const schemaSpyRoot = path.join(publicRoot, "schemaspy");
 
+// Inline self-contained theme toggle. Targets [data-parthenon-theme-toggle]
+// elements anywhere on the page; updates html.light + the visible mode
+// label; persists to localStorage; honors OS theme changes in system mode.
+const THEME_TOGGLE_SCRIPT = `<script data-parthenon-theme-script>
+      (function(){
+        function getEffective(mode){
+          if(mode==='light')return 'light';
+          if(mode==='dark')return 'dark';
+          return (window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+        }
+        function apply(mode){
+          var eff=getEffective(mode);
+          document.documentElement.classList.toggle('light',eff==='light');
+          try{localStorage.setItem('parthenon-theme',mode);}catch(e){}
+          document.querySelectorAll('[data-parthenon-theme-toggle]').forEach(function(btn){
+            var label=btn.querySelector('[data-parthenon-theme-mode]');
+            if(label)label.textContent=mode;
+            btn.title='Theme: '+mode+' (resolved: '+eff+'). Click to cycle (system → dark → light).';
+          });
+        }
+        var current=(function(){try{return localStorage.getItem('parthenon-theme')||'system';}catch(e){return 'system';}})();
+        apply(current);
+        document.addEventListener('click',function(e){
+          var btn=e.target.closest&&e.target.closest('[data-parthenon-theme-toggle]');
+          if(!btn)return;
+          e.preventDefault();
+          var modes=['system','dark','light'];
+          var cur=(function(){try{return localStorage.getItem('parthenon-theme')||'system';}catch(e){return 'system';}})();
+          var next=modes[(modes.indexOf(cur)+1)%3];
+          apply(next);
+        });
+        if(window.matchMedia){
+          var mql=window.matchMedia('(prefers-color-scheme: dark)');
+          var listener=function(){
+            var stored=(function(){try{return localStorage.getItem('parthenon-theme')||'system';}catch(e){return 'system';}})();
+            if(stored==='system')apply('system');
+          };
+          if(mql.addEventListener)mql.addEventListener('change',listener);
+          else if(mql.addListener)mql.addListener(listener);
+        }
+      })();
+    </script>`;
+
 const dbHost = process.env.SCHEMASPY_DB_HOST || "127.0.0.1";
 const dbPort = process.env.SCHEMASPY_DB_PORT || "5432";
 const dbName = process.env.SCHEMASPY_DB_NAME || "parthenon";
@@ -244,6 +287,10 @@ function makeAnalysisHtml(schema) {
       </nav>
       <div class="header-actions">
         <nav class="quick-actions" aria-label="Schema report links">${links}</nav>
+        <button class="theme-toggle" type="button" data-parthenon-theme-toggle aria-label="Cycle theme: system, dark, light">
+          <span class="theme-indicator" aria-hidden="true"></span>
+          <span class="theme-mode-label" data-parthenon-theme-mode>system</span>
+        </button>
       </div>
     </header>
     <main>
@@ -329,6 +376,7 @@ function makeAnalysisHtml(schema) {
       </nav>
       <span>Catalog data comes from PostgreSQL metadata estimates, not full table scans.</span>
     </footer>
+    ${THEME_TOGGLE_SCRIPT}
   </body>
 </html>
 `;
@@ -396,6 +444,10 @@ function makeIndexHtml(manifest) {
           <a href="/schemaspy/manifest.json" class="button">Manifest JSON</a>
           <a href="/" class="button">Portal</a>
         </nav>
+        <button class="theme-toggle" type="button" data-parthenon-theme-toggle aria-label="Cycle theme: system, dark, light">
+          <span class="theme-indicator" aria-hidden="true"></span>
+          <span class="theme-mode-label" data-parthenon-theme-mode>system</span>
+        </button>
       </div>
     </header>
     <main>
@@ -441,6 +493,7 @@ function makeIndexHtml(manifest) {
       </nav>
       <span>Generated from SchemaSpy plus PostgreSQL catalog metadata.</span>
     </footer>
+    ${THEME_TOGGLE_SCRIPT}
   </body>
 </html>
 `;

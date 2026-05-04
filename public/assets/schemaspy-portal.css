@@ -138,6 +138,56 @@ html.light .parthenon-themed {
   font-weight: 600;
 }
 
+/* In-page theme toggle on schemaspy chrome bar — cycles
+   System → Dark → Light → System. Wired by the inline script
+   appended before </body>. */
+.parthenon-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--p-text-muted);
+  font-family: "Source Sans 3", "Helvetica Neue", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.parthenon-theme-toggle:hover,
+.parthenon-theme-toggle:focus-visible {
+  color: var(--p-text);
+  background: var(--p-glass-bg);
+  border-color: var(--p-border);
+  outline: none;
+}
+
+.parthenon-theme-toggle .parthenon-theme-dot {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: var(--p-accent);
+  box-shadow: inset -4px 0 0 var(--p-surface-overlay);
+}
+
+html.light .parthenon-theme-toggle .parthenon-theme-dot {
+  background: var(--p-accent-light);
+  box-shadow: inset -4px 0 0 var(--p-surface-elevated);
+}
+
+.parthenon-theme-toggle [data-parthenon-theme-mode] {
+  font-size: 0.75rem;
+  color: var(--p-text-ghost);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+}
+
 /* AdminLTE main-header — slim it down so it sits below the portal chrome
    without being a competing brand bar. */
 .parthenon-themed .main-header,

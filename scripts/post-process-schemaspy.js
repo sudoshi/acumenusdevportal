@@ -29,12 +29,62 @@ const PREFLIGHT = `<script>
 const STYLE_LINKS = `<link rel="stylesheet" href="/assets/styles.css">
     <link rel="stylesheet" href="/assets/schemaspy-portal.css">`;
 
+// Inline self-contained theme toggle. Targets any element with
+// [data-parthenon-theme-toggle] and updates html.light + the visible
+// mode label. Listens for OS theme changes when in system mode.
+const THEME_TOGGLE_SCRIPT = `<script data-parthenon-theme-script>
+      (function(){
+        function getEffective(mode){
+          if(mode==='light')return 'light';
+          if(mode==='dark')return 'dark';
+          return (window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+        }
+        function apply(mode){
+          var eff=getEffective(mode);
+          document.documentElement.classList.toggle('light',eff==='light');
+          try{localStorage.setItem('parthenon-theme',mode);}catch(e){}
+          document.querySelectorAll('[data-parthenon-theme-toggle]').forEach(function(btn){
+            var label=btn.querySelector('[data-parthenon-theme-mode]');
+            if(label)label.textContent=mode;
+            btn.title='Theme: '+mode+' (resolved: '+eff+'). Click to cycle (system → dark → light).';
+          });
+        }
+        var current=(function(){try{return localStorage.getItem('parthenon-theme')||'system';}catch(e){return 'system';}})();
+        apply(current);
+        document.addEventListener('click',function(e){
+          var btn=e.target.closest&&e.target.closest('[data-parthenon-theme-toggle]');
+          if(!btn)return;
+          e.preventDefault();
+          var modes=['system','dark','light'];
+          var cur=(function(){try{return localStorage.getItem('parthenon-theme')||'system';}catch(e){return 'system';}})();
+          var next=modes[(modes.indexOf(cur)+1)%3];
+          apply(next);
+        });
+        if(window.matchMedia){
+          var mql=window.matchMedia('(prefers-color-scheme: dark)');
+          var listener=function(){
+            var stored=(function(){try{return localStorage.getItem('parthenon-theme')||'system';}catch(e){return 'system';}})();
+            if(stored==='system')apply('system');
+          };
+          if(mql.addEventListener)mql.addEventListener('change',listener);
+          else if(mql.addListener)mql.addListener(listener);
+        }
+      })();
+    </script>`;
+
 const SENTINEL = "data-parthenon-themed";
 
 function htmlEscape(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;",
   })[c]);
+}
+
+function themeToggleButton() {
+  return `<button class="parthenon-theme-toggle" type="button" data-parthenon-theme-toggle aria-label="Cycle theme: system, dark, light">
+        <span class="parthenon-theme-dot" aria-hidden="true"></span>
+        <span data-parthenon-theme-mode>system</span>
+      </button>`;
 }
 
 function chromeBar(schemaName, pageLabel) {
@@ -50,6 +100,7 @@ function chromeBar(schemaName, pageLabel) {
         <span class="parthenon-crumb-sep" aria-hidden="true">›</span>
         <span class="parthenon-crumb-current">${htmlEscape(pageLabel)}</span>
       </nav>
+      ${themeToggleButton()}
     </div>`;
 }
 
@@ -69,11 +120,8 @@ function pageLabelFor(file) {
 }
 
 function processFile(file, schemaName) {
-  let src = fs.readFileSync(file, "utf8");
-
-  if (src.includes(SENTINEL)) {
-    return false; // already processed
-  }
+  const before = fs.readFileSync(file, "utf8");
+  let src = before;
 
   // Insert preflight + portal stylesheets before the existing schemaSpy.css
   // so portal styles cascade after Bootstrap/AdminLTE.
@@ -84,22 +132,41 @@ function processFile(file, schemaName) {
     );
   }
 
-  // Tag <body> so the override stylesheet activates.
-  src = src.replace(
-    /<body class="([^"]*?)"/,
-    (_m, cls) => `<body class="${cls} parthenon-themed" ${SENTINEL}="1"`
-  );
+  // Tag <body> so the override stylesheet activates. Idempotent: only
+  // adds the class + sentinel if absent.
+  if (!src.match(/<body[^>]*\bparthenon-themed\b/)) {
+    src = src.replace(
+      /<body class="([^"]*?)"/,
+      (_m, cls) => `<body class="${cls} parthenon-themed" ${SENTINEL}="1"`
+    );
+  }
 
-  // Insert the portal chrome bar at the very start of <body>.
-  if (!src.includes('class="parthenon-portal-chrome"')) {
-    const label = pageLabelFor(file);
-    const bar = chromeBar(schemaName, label);
+  // Replace any existing portal chrome bar with the current version
+  // (handles upgrades — e.g., adding the theme toggle button to existing
+  // themed pages). If absent, insert fresh.
+  const label = pageLabelFor(file);
+  const bar = chromeBar(schemaName, label);
+  if (src.includes('class="parthenon-portal-chrome"')) {
+    src = src.replace(
+      /<div class="parthenon-portal-chrome"[\s\S]*?<\/div>\s*/,
+      `${bar}\n        `
+    );
+  } else {
     src = src.replace(
       /(<body[^>]*>)/,
       `$1\n        ${bar}`
     );
   }
 
+  // Inject the theme-toggle script before </body>, idempotent.
+  if (!src.includes("data-parthenon-theme-script")) {
+    src = src.replace(
+      /<\/body>/,
+      `    ${THEME_TOGGLE_SCRIPT}\n    </body>`
+    );
+  }
+
+  if (src === before) return false;
   fs.writeFileSync(file, src);
   return true;
 }
